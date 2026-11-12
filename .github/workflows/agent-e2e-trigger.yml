@@ -1,0 +1,27 @@
+name: Agent E2E trigger
+on:
+  workflow_dispatch:
+    inputs:
+      issue:
+        description: 'Issue number to comment on'
+        required: true
+      message:
+        description: 'Message to post'
+        required: true
+        default: '@wwtempyx Please add a CONTRIBUTING.md with a short setup section (clone, install, run), under 20 lines.'
+jobs:
+  comment:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const {issue, message} = context.payload.inputs ?? inputs;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: Number(issue),
+              body: message,
+            });
